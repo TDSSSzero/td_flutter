@@ -1,0 +1,13 @@
+ui_pig.png
+size:256,512
+filter:Linear,Linear
+pma:true
+jinzhubi
+bounds:2,2,88,98
+rotate:90
+zhu
+bounds:2,92,176,178
+rotate:90
+zhudi
+bounds:2,270,212,221
+offsets:1,1,214,223
