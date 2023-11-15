@@ -4,10 +4,16 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'package:td_flutter/module/image_test/mindset_crop_rect/mindset_crop_rect.dart';
+import 'package:td_flutter/home/home_logic.dart';
+import 'package:td_flutter/home/home_state.dart';
+import 'package:td_flutter/module/image_test/mindset_crop_rect/crop_rect_point_widget.dart';
+import 'package:td_flutter/module/image_test/mindset_crop_rect/crop_rect_widget.dart';
+import 'package:td_flutter/module/image_test/mindset_crop_rect/draw_crop_image.dart';
+import 'package:td_flutter/module/image_test/mindset_crop_rect/crop_rect.dart';
 
 import 'image_test_logic.dart';
 
@@ -21,7 +27,9 @@ class ImageTestPage extends StatefulWidget {
 class _ImageTestPageState extends State<ImageTestPage> {
   final logic = Get.put(ImageTestLogic());
 
-  final state = Get.find<ImageTestLogic>().state;
+  final state = Get
+      .find<ImageTestLogic>()
+      .state;
 
   final reKey = GlobalKey();
 
@@ -29,110 +37,211 @@ class _ImageTestPageState extends State<ImageTestPage> {
 
   late final String tempPath;
   File? imageFile;
-  ValueNotifier<Offset> _offset = ValueNotifier(Offset.zero);
-  var xPos = 0.0;
-  var yPos = 0.0;
-  final width = 300.0;
-  final height = 300.0;
-  bool _dragging = false;
   Offset? _center;
-  bool _insideRect(double x,double y) {
-    print("x:$xPos , y:$yPos");
-    return x >= _center!.dx - width / 2 + xPos && x <= _center!.dx + width / 2 + xPos
-        && y >= _center!.dy - height / 2 + yPos && y <= _center!.dy + height / 2 + yPos;
-  }
+
+  double rectWidth = 300;
+  double rectHeight = 300;
+
+
+  Offset topLeftOffset = Offset.zero;
+  Offset bottomRightOffset = Offset.zero;
 
   @override
   void initState() {
     super.initState();
+    _center = Get
+        .find<HomeLogic>()
+        .state
+        .center;
+    print("center : $_center ");
     () async {
       tempPath = (await getTemporaryDirectory()).path;
-      print("tempPath : $tempPath");
-      imageFile = File("$tempPath/test.png");
-    }();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    final x = MediaQuery.of(context).size.width / 2;
-    final y = MediaQuery.of(context).size.height / 2;
-    print("x:$x , y:$y");
-    _center = Offset(x, y);
-    });
+    print("tempPath : $tempPath");
+    imageFile = File("$tempPath/test.png"
+    );
+  }
+    (
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
-      body: Stack(
-        children:[
-          RepaintBoundary(
-              key: reKey,
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: AspectRatio(
-                    aspectRatio: 16.0 / 9.0,
-                    child: Image(image: AssetImage("assets/cat/1.png"),fit: BoxFit.fill,)),
-              )
-          ),
-          _buildCenter(),
-          _buildCustom(),
-        ]
+      body: WillPopScope(
+        onWillPop: () async {
+          if (state.isShowCropPointRect.value || state.isShowCropRect.value) {
+            state.isShowCropRect.value = false;
+            state.isShowCropPointRect.value = false;
+            return false;
+          }
+          return true;
+        },
+        child: Stack(
+            children: [
+              RepaintBoundary(
+                  key: reKey,
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: AspectRatio(
+                        aspectRatio: 16.0 / 9.0,
+                        child: Image(image: AssetImage("assets/cat/1.png"),
+                          fit: BoxFit.fill,)),
+                  )
+              ),
+              _buildCenter(),
+              _buildCustom(),
+              _buildCropButton(),
+            ]
+        ),
       ),
     );
   }
 
   Center _buildCenter() {
     return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(onPressed: ()async{
-
-              }, child: Text("crop")),
-              // cropData == null ? const SizedBox() :
-              // Image(image: MemoryImage(cropData!),width: 100,height: 100),
-              // !File("$tempPath/test.png").existsSync() ? const SizedBox() :
-              // imageFile == null ? const SizedBox() :
-              // Image(image: FileImage(File("$tempPath/test.png")),width: 300,height: 300),
-            ],
-          ),
-        );
-  }
-
-  Widget _buildCustom(){
-    return GestureDetector(
-      onPanStart: (details) => _dragging = _insideRect(
-        details.localPosition.dx,
-        details.localPosition.dy,
-      ),
-      onPanEnd: (details) {
-        _dragging = false;
-      },
-      onPanUpdate: update,
-      child: CustomPaint(
-        size: const Size(double.infinity, double.infinity),
-        painter: MindsetCropRect(width,height,Offset(xPos, yPos),50),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(onPressed: () => state.isShowCropRect.value = true,
+              child: Text("cropRect")),
+          ElevatedButton(
+              onPressed: () => state.isShowCropPointRect.value = true,
+              child: Text("cropPointRect")),
+        ],
       ),
     );
   }
 
-  void start(DragStartDetails details,BoxConstraints size){
-
+  Widget _buildCustom() {
+    return Obx(() {
+      if (state.isShowCropRect.value) {
+        return CropRectWidget(positionCallback: (topLeft)=> topLeftOffset = topLeft);
+      }
+      if (state.isShowCropPointRect.value) {
+        return CropRectPointWidget(
+            positionCallback: (topLeft,bottomRight){
+              topLeftOffset = topLeft;
+              bottomRightOffset = bottomRight;
+            },
+          defaultWidth: 300,
+          defaultHeight: 300,
+          windowCenter: _center!,
+        );
+      }
+      return const SizedBox();
+    });
   }
 
-  void update(DragUpdateDetails details){
-    // print("localPosition : ${details.localPosition}");
-    if (_dragging) {
-      setState(() {
-        xPos += details.delta.dx;
-        yPos += details.delta.dy;
-        // print("dragging offset ${Offset(xPos, yPos)}");
-      });
+  Widget _buildCropButton() {
+    return Obx(() {
+      if(state.isShowCropPointRect.value || state.isShowCropRect.value){
+        return Container(
+          alignment: Alignment.bottomCenter,
+          margin: EdgeInsets.only(bottom: 100, left: 100),
+          child: Row(
+            children: [
+              ElevatedButton(onPressed: () async {
+                // _showCropPaint();
+                _showCropDialog();
+              }, child: Text("拍照")),
+              ElevatedButton(onPressed: () {
+                state.isShowCropPointRect.value = false;
+                state.isShowCropRect.value = false;
+                }, child: Text("取消")),
+            ],
+          ),
+        );
+      }
+      return const SizedBox();
+    });
+  }
+
+  void _showCropPaint() async {
+    try {
+      final double dpr = View
+          .of(context)
+          .devicePixelRatio;
+      RenderRepaintBoundary boundary =
+      reKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
+      ui.Image uiImage = await boundary.toImage(pixelRatio: dpr);
+      // double leftX = _center!.dx - rectWidth / 2 + xPos;
+      // double topY = _center!.dy - rectHeight / 2 + yPos;
+      // print("leftX: $leftX, topY: $topY");
+      double x = topLeftOffset.dx * dpr;
+      double y = topLeftOffset.dy * dpr;
+      double imageWidth = rectWidth * dpr;
+      double imageHeight = rectHeight * dpr;
+      print(
+          "x: $x, y: $y, imageWidth: $imageWidth, imageHeight: $imageHeight,dpr : $dpr");
+      Rect cropRect = Rect.fromLTWH(x, y, imageWidth, imageHeight);
+
+      await SmartDialog.show(
+          useAnimation: false,
+          builder: (_) =>
+              Container(
+                width: rectWidth + 20,
+                height: rectHeight + 20,
+                child:
+                CustomPaint(
+                  painter: DrawCropImage(uiImage, cropRect),
+                ),
+              )
+      );
     }
-    // _offset.value = details.localPosition;
+    catch (e) {
+      print("error : $e");
+    }
   }
 
-  void cropImage(int x,int y,int width,int height)async{
+  void _showCropDialog() async {
+    rectWidth = bottomRightOffset.dx - topLeftOffset.dx;
+    rectHeight = bottomRightOffset.dy - topLeftOffset.dy;
+    final double dpr = View
+        .of(context)
+        .devicePixelRatio;
+    int x = (topLeftOffset.dx * dpr).toInt();
+    int y = (topLeftOffset.dy * dpr).toInt();
+    int imageWidth = (rectWidth * dpr).toInt();
+    int imageHeight = (rectHeight * dpr).toInt();
+    print(
+        "x: $x,y: $y,width: $rectWidth,height: $rectHeight,rawLeft : ${topLeftOffset.dx},rawRight:${topLeftOffset.dy}");
+    try {
+      RenderRepaintBoundary boundary =
+      reKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
+      ui.Image uiImage = await boundary.toImage(pixelRatio: dpr);
+      ByteData? byteData = await uiImage.toByteData(
+          format: ui.ImageByteFormat.png);
+      Uint8List? pngBytes = byteData?.buffer.asUint8List();
+      String path = "$tempPath/test_${DateTime.timestamp()}.png";
+      print("pngBytes: ${pngBytes == null}");
+      img.Command cmd = img.Command()
+        ..decodeImage(pngBytes!)
+        ..copyCrop(x: x, y: y, width: imageWidth, height: imageHeight)
+        ..writeToFile(path);
+      cmd = await cmd.execute();
+      File file = File(path);
+      if (file.existsSync()) {
+        await SmartDialog.show(builder: (_) =>
+            Container(
+              width: rectWidth + 20,
+              height: rectHeight + 20,
+              child: Image(image: FileImage(file)),
+            )
+        );
+      }
+    }
+    catch (e) {
+      print("error : $e");
+    }
+    setState(() {
+
+    });
+  }
+
+
+  void cropImage(int x, int y, int width, int height) async {
     try {
       RenderRepaintBoundary boundary =
       reKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
@@ -140,7 +249,8 @@ class _ImageTestPageState extends State<ImageTestPage> {
       int width = uiImage.width;
       int height = uiImage.height;
       print("width: ${uiImage.width},height: ${uiImage.height}");
-      ByteData? byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData = await uiImage.toByteData(
+          format: ui.ImageByteFormat.png);
       Uint8List? pngBytes = byteData?.buffer.asUint8List();
       print("pngBytes: ${pngBytes == null}");
       img.Command cmd = img.Command()
@@ -158,4 +268,11 @@ class _ImageTestPageState extends State<ImageTestPage> {
       print("error : $e");
     }
   }
+}
+
+enum ExpandRect {
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight
 }

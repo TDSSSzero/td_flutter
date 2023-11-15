@@ -12,6 +12,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logic.getCenterOffset(context);
     return Scaffold(
       body: _buildHomeList(),
     );

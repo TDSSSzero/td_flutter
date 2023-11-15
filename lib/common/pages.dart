@@ -19,7 +19,6 @@ import 'package:td_flutter/module/spine/spine_view.dart';
 import 'package:td_flutter/module/test/test_view.dart';
 import 'package:td_flutter/module/video_player/video_player_view.dart';
 
-import '../module/auido_wave/audio_wave.dart';
 import '../module/chart/bar_chart.dart';
 import '../module/chart/line_chart/line_chart_view.dart';
 import '../module/hero_test/hero_detail_view.dart';
@@ -48,7 +47,6 @@ class Pages{
   static const String quillPage = "/quillPage";
   // static const String markdownPage = "/markdownPage";
   static const String recordPage = "/recordPage";
-  static const String wavePage = "/wavePage";
   static const String autoTextPage = "/autoTextPage";
   static const String audioWaveformsPage = "/audioWaveformsPage";
   static const String barChartPage = "/barChartPage";
@@ -78,7 +76,6 @@ class Pages{
     GetPage(name: spinePage, page: () => SpinePage()),
     GetPage(name: quillPage, page: () => QuillTestPage()),
     // GetPage(name: recordPage, page: () => RecordPage(onStop: (String path) {  },)),
-    GetPage(name: wavePage, page: () => AudioWavePage()),
     GetPage(name: autoTextPage, page: () => AutoTextPage()),
     GetPage(name: audioWaveformsPage, page: () => AudioWaveformsPage()),
     GetPage(name: barChartPage, page: () => BarChartSample3()),
@@ -97,7 +94,6 @@ class Pages{
     heroTestPage,
     imageTestPage,
     audioWaveformsPage,
-    wavePage,
     autoTextPage,
     linePage,
     barChartPage,

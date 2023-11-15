@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:td_flutter/common/pages.dart';
 
 class HomeState {
 
+  Offset center = Offset.zero;
 
 
   List<String> pageTitle = [
@@ -12,7 +15,6 @@ class HomeState {
     'hero test',
     'image test',
     'go record wave',
-    'go wave',
     'go auto text',
     'go 线形图',
     'go 柱状图',

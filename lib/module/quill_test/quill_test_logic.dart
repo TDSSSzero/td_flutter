@@ -24,7 +24,7 @@ class QuillTestLogic extends GetxController {
 
   BoxConstraints? size;
 
-  int limit = 50;
+  int limit = 200;
 
   final currentLength = 0.obs;
 

@@ -4,9 +4,9 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:get/get.dart';
+import 'package:td_flutter/module/mindset_quill/quill/mindset_quill_editor.dart';
 import 'package:td_flutter/module/quill_test/embed_test.dart';
 import 'package:td_flutter/module/quill_test/my_quill_toolbar.dart';
-import 'package:td_flutter/module/quill_test/my_style.dart';
 
 import 'quill_test_logic.dart';
 
@@ -40,7 +40,7 @@ class _QuillTestPageState extends State<QuillTestPage> {
                       IconButton(onPressed: () {
                         logic.minSize.value = logic.minSize.value - 1.0;
                       }, icon: Icon(Icons.remove_circle)),
-                      Text("当前字体最小值：${logic.minSize.value}",),
+                      Text("字体最小值：${logic.minSize.value}",),
                     ],);
                 }),
                 Obx(() {
@@ -53,7 +53,7 @@ class _QuillTestPageState extends State<QuillTestPage> {
                     ],);
                 }),
                 Obx(() {
-                  return Text("当前长度：${logic.currentLength.value} / 50");
+                  return Text("当前长度：${logic.currentLength.value} / ${logic.limit}");
                 }),
                 SizedBox(height: 20,),
                 Container(
@@ -69,7 +69,6 @@ class _QuillTestPageState extends State<QuillTestPage> {
                     );
                   }),
                 ),
-                // ZefyrToolbar.basic(controller: _logic.controller),
                 LayoutBuilder(
                   builder: (context, size) {
                     var defaultTextStyle = DefaultTextStyle.of(context);
@@ -80,28 +79,18 @@ class _QuillTestPageState extends State<QuillTestPage> {
                       width: 200,
                       height: 100,
                       child: Obx(() {
-                        return quill.QuillEditor(
-                          customStyles: quill.DefaultStyles(
-                            paragraph: quill.DefaultTextBlockStyle(
-                                TextStyle(fontSize: logic.fontSize.value),
-                                const quill.VerticalSpacing(0, 0),
-                                const quill.VerticalSpacing(0, 0),
-                                null
-                            ),
-                          ),
-                          controller: logic.controller,
-                          readOnly: false,
-                          autoFocus: true,
-                          focusNode: FocusNode(),
-                          expands: false,
-                          scrollable: true,
-                          padding: const EdgeInsets.all(0),
-                          scrollController: logic.scrollController,
-                          embedBuilders: [
-                            ...FlutterQuillEmbeds.builders(),
-                            TimeStampEmbedBuilderWidget()
-                          ],
-                        );
+                        return
+                          MindsetQuillEditor(
+                              quillController: logic.controller,
+                              scrollController: logic.scrollController,
+                              maxTextLength: logic.limit,
+                              onTextChanged: (doc){
+                                print("doc : ${doc.toPlainText()}");
+                              },
+                              focusNode: state.quillNode,
+                              autoFocus: false,
+                              document: quill.Document()
+                          );
                       }),
                     );
                   },

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../module/daily/daily_callback.dart';
@@ -24,4 +25,12 @@ class HomeLogic extends GetxController {
     // TODO: implement onClose
     super.onClose();
   }
+
+  void getCenterOffset(BuildContext context){
+    final x = MediaQuery.of(context).size.width / 2;
+    final y = MediaQuery.of(context).size.height / 2;
+    print("home center x:$x , y:$y");
+    state.center = Offset(x, y);
+  }
+
 }

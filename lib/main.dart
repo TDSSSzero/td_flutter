@@ -11,14 +11,11 @@ import 'init.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  //manual手动配置系统叠加层，始终显示顶部状态栏overlays:top
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays: [SystemUiOverlay.top]);
-  //自定义系统叠加层样式，系统底部导航栏颜色为透明
-  SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        systemNavigationBarColor:Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-      ));
+  //设置屏幕方向为竖屏
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  //immersiveSticky全屏模式，始终显示顶部状态栏overlays:top
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,overlays: [SystemUiOverlay.top]);
   await initSpineFlutter(enableMemoryDebugging: false);
   await initServices();
   initializeDateFormatting().then((value) => runApp(const MyApp()));
@@ -43,8 +40,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   
   getFile()async{
     final dir = await getApplicationSupportDirectory();
-    final mmkvFilename = "bettermindset_mmkv";
-    String path = "${dir.path}/flutter_mmkv/$mmkvFilename";
+    String path = "${dir.path}/flutter_mmkv/bettermindset_mmkv";
     print(path);
   }
 
