@@ -38,10 +38,10 @@ class QuillTestLogic extends GetxController {
       // print("after : $after");
       // print("ChangeSource ${change.source}");
       textData.value = controller.document.toPlainText();
-      _calculateFontSize(size, TextStyle(fontSize: fontSize.value));
+      // _calculateFontSize(size, TextStyle(fontSize: fontSize.value));
     });
     scrollController.addListener(() {
-      print("offset: ${scrollController.offset}");
+      // print("offset: ${scrollController.offset}");
       if (scrollController.offset > 0){
         if(fontSize.value > minSize.value){
           fontSize.value -= 2;
@@ -89,6 +89,10 @@ class QuillTestLogic extends GetxController {
       controller.document = Document.fromJson(jsonDecode(json));
     }
   }
+  void onGetKey() {
+    final editorState = state.editorKey.currentState;
+    print("editorState ${editorState}");
+  }
 
   void changeMaxText(){
 
@@ -107,11 +111,9 @@ class QuillTestLogic extends GetxController {
         textAlign: TextAlign.left,
         textDirection: TextDirection.ltr,
       );
-      // print("size maxHeight : ${size.maxHeight}");
-      print("size maxWidth : ${size.maxWidth}");
       textPainter.layout(maxWidth: size.maxWidth);
-      print("textPainter.height : ${textPainter.height}");
-      print("textPainter.height > constraints.maxHeight : ${textPainter.height > 100}");
+      // print("textPainter.height : ${textPainter.height}");
+      // print("textPainter.height > constraints.maxHeight : ${textPainter.height > 100}");
       // if(textPainter.height >= 100-fontSize.value){
       //   isOut.value = true;
       // }else{

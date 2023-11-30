@@ -60,8 +60,8 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
     );
     _initStreams();
     if(Get.arguments != null){
-      // final i = Get.arguments;
-      _playMusic('chilichill.ogg');
+      final i = Get.arguments;
+      // _playMusic('chilichill.ogg');
     }
 
 
@@ -86,6 +86,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
     _positionSubscription?.cancel();
     _playerCompleteSubscription?.cancel();
     _playerStateChangeSubscription?.cancel();
+    player.dispose();
     super.dispose();
   }
 

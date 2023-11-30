@@ -49,72 +49,61 @@ class _AnimPageState extends State<AnimPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            ElevatedButton(onPressed: () {
-              // controller.reset
-              showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  transitionAnimationController: controller,
-                  enableDrag: false,
-                  builder: (_) {
-                    return
-                      SizedBox(
-                        height: 300,
-                        width: double.infinity,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Center(
-                              child: ClipRRect(
-                                // 裁剪为圆角
-                                  borderRadius:
-                                  const BorderRadius.vertical(
-                                      top: Radius.circular(30)),
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                      sigmaX: 3.0,
-                                      sigmaY: 3.0,
-                                    ),
-                                    child: Container(
-                                      color: Colors.black.withOpacity(0.4),
-                                      alignment: Alignment.center,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .end,
-                                            children: [
-                                              Text("test")
-                                            ],
-                                          ),
-                                        ],
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            children: [
+              ElevatedButton(onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    transitionAnimationController: controller,
+                    enableDrag: false,
+                    builder: (_) {
+                      return
+                        SizedBox(
+                          height: 300,
+                          width: double.infinity,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Center(
+                                child: ClipRRect(
+                                  // 裁剪为圆角
+                                    borderRadius:
+                                    const BorderRadius.vertical(
+                                        top: Radius.circular(30)),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 3.0,
+                                        sigmaY: 3.0,
                                       ),
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        ),
-                      );
-                  });
-            }, child: Text("show")),
-            Obx(() {
-              print("rebuild");
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: ElevatedButton(onPressed: () {
-                }, child: Text(state.str.value)),
-              );
-            }),
-            ElevatedButton(onPressed: (){
-              state.str.value = "${state.str.value}";
-              state.str.refresh();
-            }, child: Text("ssss"))
-          ],
+                                      child: Container(
+                                        color: Colors.black.withOpacity(0.4),
+                                        alignment: Alignment.center,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .end,
+                                              children: [
+                                                Text("test")
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )),
+                              ),
+                            ],
+                          ),
+                        );
+                    });
+              }, child: Text("show")),
+            ],
+          ),
         ),
       ),
     );

@@ -88,8 +88,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   }
 
   Widget _builder(BuildContext context, Widget? child) {
-    return Scaffold(
-      body: child,
+    //全局字体缩放为1
+    return MediaQuery(
+      data: MediaQueryData.fromView(View.of(context)).copyWith(textScaleFactor: 1),
+      child: Scaffold(
+        body: child,
+      ),
     );
   }
 }

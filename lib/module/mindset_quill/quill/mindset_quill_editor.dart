@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_quill/src/widgets/raw_editor.dart';
 
-import '../function.dart';
+import '../../../function.dart';
 import 'embed_time.dart';
 
 class MindsetQuillEditor extends StatefulWidget {
@@ -19,6 +19,9 @@ class MindsetQuillEditor extends StatefulWidget {
   final Document document;
 
   final SingleCallback<Document> onTextChanged;
+  final SingleCallback<double>? onTextFontChanged;
+
+  final GlobalKey? testKey;
 
   const MindsetQuillEditor({
     super.key,
@@ -30,6 +33,8 @@ class MindsetQuillEditor extends StatefulWidget {
     required this.autoFocus,
     required this.document,
     this.defaultFontSize,
+    this.onTextFontChanged,
+    this.testKey
   });
 
   @override
@@ -43,9 +48,16 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
 
   bool isShowToast = false;
   double fontSize = 20;
+  BoxConstraints? boxSize;
+
+  GlobalKey key = GlobalKey();
+
+
+
 
   @override
   void didUpdateWidget(covariant MindsetQuillEditor oldWidget) {
+    fontSize = widget.defaultFontSize!;
     _updateDiary();
     super.didUpdateWidget(oldWidget);
   }
@@ -54,21 +66,33 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
   void initState() {
     sub ??= widget.quillController.document.changes.listen((change) {
       _checkMaxTextLength();
+      _calculateFontSize();
     });
-    widget.quillController.onSelectionChanged = (textSelection){
-      _checkTextSelection(textSelection);
-    };
+    widget.quillController.onSelectionChanged = _checkTextSelection;
     //自动缩小字体
     fontSize = widget.defaultFontSize ?? 20;
-    widget.scrollController.addListener(() {
-      if (widget.scrollController.offset > 0){
-        if(fontSize > 16.0){
-          setState(() {
-            fontSize -= 2;
-          });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final quillEditorState = key.currentState as QuillEditorState;
+      final rawEditorState = quillEditorState.editableTextKey.currentState as RawEditorState;
+      rawEditorState.addRawEditorSizeCallback("test",(size){
+        final height = size!.height;
+        if(height > boxSize!.maxHeight){
+
         }
-      }
+      });
     });
+    // widget.scrollController.addListener(() {
+    //   if (widget.scrollController.offset > 0){
+    //     if(fontSize > 20){
+    //       setState(() {
+    //         fontSize -= 2;
+    //         if(widget.onTextFontChanged != null){
+    //           widget.onTextFontChanged!(fontSize);
+    //         }
+    //       });
+    //     }
+    //   }
+    // });
     super.initState();
   }
   @override
@@ -80,27 +104,33 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return QuillEditor(
-      customStyles: DefaultStyles(
-        paragraph: DefaultTextBlockStyle(
-            TextStyle(fontSize: fontSize, color: Colors.black),
-            const VerticalSpacing(0, 0),
-            const VerticalSpacing(0, 0),
-            null),
-      ),
-      controller: widget.quillController,
-      readOnly: false,
-      autoFocus: widget.autoFocus,
-      focusNode: widget.focusNode,
-      expands: false,
-      minHeight: 100,
-      scrollable: true,
-      padding: const EdgeInsets.all(0),
-      scrollController: widget.scrollController,
-      embedBuilders: [
-        ...FlutterQuillEmbeds.builders(),
-        TimeStampEmbedBuilderWidget()
-      ],
+    return LayoutBuilder(
+      builder: (context,size){
+        boxSize = size;
+        return QuillEditor(
+          key: key,
+          customStyles: DefaultStyles(
+            paragraph: DefaultTextBlockStyle(
+                TextStyle(fontSize: fontSize, color: Colors.black),
+                const VerticalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                null),
+          ),
+          controller: widget.quillController,
+          readOnly: false,
+          autoFocus: widget.autoFocus,
+          focusNode: widget.focusNode,
+          expands: false,
+          minHeight: 100,
+          scrollable: true,
+          padding: const EdgeInsets.all(0),
+          scrollController: widget.scrollController,
+          embedBuilders: [
+            ...FlutterQuillEmbeds.builders(),
+            TimeStampEmbedBuilderWidget()
+          ],
+        );
+      },
     );
   }
 
@@ -109,6 +139,14 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
     sub = null;
     sub ??= widget.quillController.document.changes.listen((change) {
       _checkMaxTextLength();
+      final quillEditorState = key.currentState as QuillEditorState;
+      BuildContext? editorContext = quillEditorState.editableTextKey.currentContext;
+      final rawEditorState = quillEditorState.editableTextKey.currentState as RawEditorState;
+      // rawEditorState.addRawEditorSizeCallback((data) => print("addRawEditorSizeCallback $data"));
+      // print("key ${key.currentState}");
+      // print("editorKey ${quillEditorState.editableTextKey.currentState}");
+      // print("key ${editorContext!.size}");
+      // print("test ${widget.testKey!.currentContext!.size}");
     });
     widget.quillController.onSelectionChanged = (textSelection){
       _checkTextSelection(textSelection);
@@ -122,6 +160,7 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
     });
   }
 
+  ///检查最大字数
   void _checkMaxTextLength()async{
     widget.onTextChanged(widget.quillController.document);
     int documentLength = widget.quillController.document.length;
@@ -129,6 +168,7 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
       final addLength = documentLength - widget.maxTextLength;
       final latestIndex = offset - addLength;
       try{
+        print("超出字数长度 $addLength,超出位置: $latestIndex}");
         widget.quillController.replaceText(
           latestIndex,
           addLength,
@@ -136,8 +176,26 @@ class _MindsetQuillEditorState extends State<MindsetQuillEditor> {
           TextSelection.collapsed(offset: latestIndex),
         );
       } catch(e){
-        print("error : $e");
+        print("flutter quill error ${e.toString()}");
       }
     }
   }
+
+  void _calculateFontSize(){
+    print("fontSize value :$fontSize");
+    if(boxSize != null){
+      final span = TextSpan(
+        style: TextStyle(fontSize: fontSize),
+        text: widget.quillController.document.toPlainText(),
+      );
+      final textPainter = TextPainter(
+        text: span,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(maxWidth: boxSize!.maxWidth);
+      print("quill height ${textPainter.height},width ${textPainter.width}");
+    }
+  }
+
 }

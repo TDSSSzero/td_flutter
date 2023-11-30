@@ -5,9 +5,11 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:get/get.dart';
 import 'package:td_flutter/module/mindset_quill/quill/mindset_quill_editor.dart';
+import 'package:td_flutter/module/mindset_quill/quill/mindset_quill_toolbar.dart';
 import 'package:td_flutter/module/quill_test/embed_test.dart';
 import 'package:td_flutter/module/quill_test/my_quill_toolbar.dart';
 
+import 'mindset_quill/mindset_auto_text.dart';
 import 'quill_test_logic.dart';
 
 class QuillTestPage extends StatefulWidget {
@@ -32,7 +34,6 @@ class _QuillTestPageState extends State<QuillTestPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Spacer(flex: 1,),
                 Obx(() {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -58,10 +59,10 @@ class _QuillTestPageState extends State<QuillTestPage> {
                 SizedBox(height: 20,),
                 Container(
                   width: 200,
-                  height: 100,
+                  height: 150,
                   color: Colors.black12,
                   child: Obx(() {
-                    return AutoSizeText(
+                    return MindsetAutoText(
                       logic.textData.value,
                       textKey: textKey,
                       style: TextStyle(fontSize: logic.fontSize.value),
@@ -69,41 +70,32 @@ class _QuillTestPageState extends State<QuillTestPage> {
                     );
                   }),
                 ),
-                LayoutBuilder(
-                  builder: (context, size) {
-                    var defaultTextStyle = DefaultTextStyle.of(context);
-                    print("maxLines : ${defaultTextStyle.maxLines}");
-                    logic.size = size;
-                    return Container(
-                      color: Colors.black26,
-                      width: 200,
-                      height: 100,
-                      child: Obx(() {
-                        return
-                          MindsetQuillEditor(
-                              quillController: logic.controller,
-                              scrollController: logic.scrollController,
-                              maxTextLength: logic.limit,
-                              onTextChanged: (doc){
-                                print("doc : ${doc.toPlainText()}");
-                              },
-                              focusNode: state.quillNode,
-                              autoFocus: false,
-                              document: quill.Document()
-                          );
-                      }),
-                    );
-                  },
+                Container(
+                  color: Colors.black26,
+                  width: 200,
+                  height: 150,
+                  child: MindsetQuillEditor(
+                    testKey: state.editorKey,
+                      quillController: logic.controller,
+                      scrollController: logic.scrollController,
+                      maxTextLength: logic.limit,
+                      onTextChanged: (doc){
+                        // print("doc : ${doc.toPlainText()}");
+                      },
+                      focusNode: state.quillNode,
+                      autoFocus: false,
+                      document: quill.Document(),
+                    defaultFontSize: 20,
+                  ),
                 ),
-                // Expanded(child: TextField(maxLength: 10,)),
-                ElevatedButton(onPressed: logic.onSave, child: Text("save")),
-                ElevatedButton(
-                    onPressed: logic.onRestore, child: Text("restore")),
+                ElevatedButton(key: state.editorKey,onPressed: logic.onGetKey, child: Text("key")),
+                // ElevatedButton(onPressed: logic.onSave, child: Text("save")),
+                // ElevatedButton(onPressed: logic.onRestore, child: Text("restore")),
                 KeyboardVisibilityBuilder(builder: (_, isShow) =>
                     Expanded(
                         flex: 1,
                         child: isShow
-                            ? MyQuillBar(controller: logic.controller,)
+                            ? MindsetQuillBar(controller: logic.controller)
                             : const SizedBox()
                     )
                 ),

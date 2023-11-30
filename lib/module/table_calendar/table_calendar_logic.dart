@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-import 'chart_state.dart';
+import 'table_calendar_state.dart';
 
-class ChartLogic extends GetxController {
-  final ChartState state = ChartState();
+class TableCalendarLogic extends GetxController {
+  final TableCalendarState state = TableCalendarState();
 
   @override
   void onReady() {
