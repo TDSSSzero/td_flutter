@@ -123,6 +123,31 @@ class _HeroCalendarPageState extends State<HeroCalendarPage> {
     return Obx(() {
       return TableCalendar(
         headerStyle: const HeaderStyle(formatButtonVisible: false),
+        calendarBuilders: CalendarBuilders(
+          todayBuilder: (context, day, focusedDay) {
+            return Center(child: Icon(Icons.add_circle_outline));
+          },
+          selectedBuilder: (context, day, focusedDay) {
+            return LayoutBuilder(
+              builder:(context,size)=> Center(
+                child: Container(
+                  width: size.maxWidth * 0.6,
+                  height: size.maxHeight * 0.6,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: Colors.greenAccent,borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Text("${day.day}",style: TextStyle(color: Colors.red),),
+                ),
+              ),
+            );
+          },
+          defaultBuilder: (context, day, focusedDay) {
+            return Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/cat/1.png"))),
+              child: Text("${day.day}",style: TextStyle(color: Colors.red)),
+            );
+          },
+        ),
         onHeaderTapped: _showChooseCalendarDialog,
         locale: "zh",
         firstDay: state.earliestTime,

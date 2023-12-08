@@ -28,7 +28,7 @@ class MindsetPlusPage extends StatelessWidget {
             // children: _buildIcons().map((e) => Container(
             //   color: Colors.grey,
             //   child: e,)).toList(),
-            children: _buildChildren(6).map((e) => Container(
+            children: _buildChildren(10).map((e) => Container(
               color: Colors.grey,
               child: e,)).toList(),
           ),

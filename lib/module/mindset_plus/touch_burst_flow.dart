@@ -3,20 +3,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 
 class TouchBurstFlow extends StatefulWidget {
   final List<Widget> children;
   final Widget? menu;
 
-  TouchBurstFlow({required this.children, this.menu});
+  const TouchBurstFlow({super.key, required this.children, this.menu});
 
   @override
   _TouchBurstFlowState createState() => _TouchBurstFlowState();
 }
 
-class _TouchBurstFlowState extends State<TouchBurstFlow>
-    with SingleTickerProviderStateMixin {
+class _TouchBurstFlowState extends State<TouchBurstFlow> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   double _rad = 0.0;
   bool _closed = true;
@@ -269,7 +267,7 @@ class _CircleFlowDelegate extends FlowDelegate {
       var offsetX = rad * (radius - cSizeX) * cos(i * perRad) + radius;
       var offsetY = rad * (radius - cSizeY) * sin(i * perRad) + radius;
       // if (i == 0 || i == 0) {
-        // print("$i icon offset: x = ${offsetX}  y = ${offsetY}");
+        print("$i icon offset: x = ${offsetX}  y = ${offsetY}");
         // print("$i icon 125: x = ${radius - cSizeY}");
       // }
       context.paintChild(i,

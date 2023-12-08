@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:td_flutter/common/pages.dart';
+import 'package:td_flutter/common/time_utils.dart';
 
 import 'home_logic.dart';
 
@@ -16,7 +17,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     logic.getCenterOffset(context);
+    print("ex standard : ${DateTime.now().standard}");
     return Scaffold(
+
       body: _buildHomeList(),
     );
   }

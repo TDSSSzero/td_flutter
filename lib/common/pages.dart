@@ -13,6 +13,7 @@ import 'package:td_flutter/module/long_press/long_press_view.dart';
 import 'package:td_flutter/module/lottie/lottie_view.dart';
 import 'package:td_flutter/module/flow_burst/mindset_view.dart';
 import 'package:td_flutter/module/mindset_quill/mindset_quill_view.dart';
+import 'package:td_flutter/module/mood_handle/mood_handle_view.dart';
 import 'package:td_flutter/module/music_player/music_player_view.dart';
 import 'package:td_flutter/module/quill_test/quill_test_view.dart';
 import 'package:td_flutter/module/spine/spine_view.dart';
@@ -59,6 +60,7 @@ class Pages{
   static const String tableCalendarPage = "/tableCalendarPage";
   static const String heroCalendarPage = "/heroCalendarPage";
   static const String tagCalendarPage = "/tagCalendarPage";
+  static const String moodHandlePage = "/moodHandlePage";
 
   static const String drawPage = "/drawPage";
   static const String particleBasePage = "/particleBasePage";
@@ -94,6 +96,7 @@ class Pages{
     GetPage(name: heroCalendarPage, page: () => HeroCalendarPage()),
     GetPage(name: tagCalendarPage, page: () => ColumnCalendarPage()),
     GetPage(name: drawPage, page: () => DrawPage()),
+    GetPage(name: moodHandlePage, page: () => MoodHandlePage()),
   ];
 
   static Map<String,String> pageNames = {
@@ -102,6 +105,7 @@ class Pages{
     quillPage :              'quill富文本和自动缩小字体text对比',
     mindsetQuillPage :       'quill富文本',
     drawPage :               '绘制教程',
+    moodHandlePage :         '按压flow手势检测',
     heroTestPage :           'hero 动画',
     tableCalendarPage :      'hero 日历组件',
     imageTestPage :          'flutter手动截图',
